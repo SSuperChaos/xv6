@@ -23,6 +23,10 @@
                 //     "text": "set tdesc filename myxml.xml",
                 // }
             ],
+            "logging": {
+                // "engineLogging": true,
+                // "programOutput": true,
+            }
         }
     ]
 }

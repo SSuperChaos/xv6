@@ -1,38 +1,46 @@
-#include "kernel/stat"
-#include "kernel/types"
+#include "kernel/stat.h"
+#include "kernel/types.h"
 #include "user/user.h"
-
+void process(int p[2]);
 int main(void) {
-    int a1 = 2;
-    int a2 = 3;
-    int state = fork();
-    if (state < 0) {
-        printf("创建子进程失败");
+    //int state = fork();
+    int p[2];
+    pipe(p);
+    if (fork() == 0) {
+        process(p);
     }
-    else if (state == 0) {
-
+    else{
+        close(p[0]);
+        for (int j=2;j<50;j++){
+            write(p[1],&j,sizeof(j));
+        }
+        close(p[1]);
     }
+    wait(0);
+    exit(0);
 }
 void process(int p[2]) {
-    close(0);
-    dup(p[0]);
-    close(p[0]);
     close(p[1]);
-    int* buf, prime;
+    int buf=0;
+    int prime=0;
     int fd[2];
-    if (read(0, prime, 4)) {
-        printf("prime number: %d\n", &prime); // 打印由父进程传来的第一个数字
+    if (read(p[0], &prime, sizeof(prime))) {
+        //printf("%d:prime number: %d\n", getpid(), prime); // 打印由父进程传来的第一个数字
+        printf("prime %d\n", prime);
         pipe(fd);
         if (fork() > 0) {
-            while (read(0, buf, 4)) {
-                if ((&buf) % (&prime) != 0)
-                    write(fd[1], buf, 4);
+            close(fd[0]);
+            while (read(p[0], &buf, 4)) {
+                if ((buf) % (prime) != 0)
+                    write(fd[1], &buf, 4);
             }
+            close(p[0]);
             close(fd[1]);
-            close(0);
         }
         else {
             process(fd);
         }
+        wait(0);
+        exit(0);
     }
 }
