@@ -16,11 +16,12 @@ int main(void) {
         }
         close(p[1]);
     }
-    wait(0);
+    //wait(0);
     exit(0);
 }
+
 void process(int p[2]) {
-    close(p[1]);
+    //close(p[1]);
     int buf=0;
     int prime=0;
     int fd[2];
@@ -34,13 +35,14 @@ void process(int p[2]) {
                 if ((buf) % (prime) != 0)
                     write(fd[1], &buf, 4);
             }
+            close(p[1]);
             close(p[0]);
             close(fd[1]);
         }
         else {
             process(fd);
         }
-        wait(0);
-        exit(0);
+        //wait(0);
+        //exit(0);
     }
 }
